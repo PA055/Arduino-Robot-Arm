@@ -66,14 +66,28 @@ IK::IK(std::vector<Limb> limbs, int bias, int iterations) : limbs(limbs), bias(b
   }
 }
 
-double IK::deg_to_rad(double rad) {
+double IK::rad_to_deg(double rad) {
   return rad * 180 / PI;
 }
 
-double IK::rad_to_deg(double deg) {
+double IK::deg_to_rad(double deg) {
   return deg * PI / 180;
 }
 
+void IK::resetPositions() {
+  joints = std::vector<Vector2>();
+  joints.push_back(basePoint);
+  for (int i = 0; i < limbs.size(); i++)
+    joints[i + 1] = joints[i] + Vector2(limbs[i].length, 0);
+}
+
+void IK::resetPositions(std::vector<Vector2> joints) {
+  this->joints = joints;
+}
+
+Vector2 IK::getEndEffectorPos() {
+  return joints[joints.size() - 1];
+}
 
 std::vector<double> IK::solve(Vector2 target) {
   std::vector<Vector2> prev_joints(joints);

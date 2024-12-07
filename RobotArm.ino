@@ -1,22 +1,29 @@
 #include <Servo.h>
-#include <Stepper.h>
+#include "Base.h"
+#include "IK.h"
 
 Servo s1, s2, s3;
-const int STEPS_PER_ROTATION = 2048;
-Stepper m(STEPS_PER_ROTATION, 8, 10, 9, 11);
+Base m(2048, 8, 10, 9, 11);
 auto joyX = A1;
 auto joyY = A0;
 auto joyP = 2;
 
-int angle = 90;
-int motorAngle = 0;
+double goalX;
+double goalY;
+double goalTheta;
+
+IK ik({
+//  limb len (in)   min angle constraint    max angle constraint
+  { 7,              IK::deg_to_rad(-90),    IK::deg_to_rad(90)},
+  { 7,              IK::deg_to_rad(-90),    IK::deg_to_rad(90)},
+  { 7,              IK::deg_to_rad(-90),    IK::deg_to_rad(90)}
+});
 
 void setup() {
   // put your setup code here, to run once:
   s1.attach(3);
   s2.attach(5);
   s3.attach(6);
-  m.setSpeed(10);
   pinMode(joyP, INPUT);
   Serial.begin(9600);
 }
@@ -29,19 +36,5 @@ void loop() {
   if ((y < 0.2 && y > 0) || (y > -0.2 && y < 0)) y = 0;
   Serial.println(x);
   Serial.println(y);
-  Serial.println(angle);
-  Serial.println(motorAngle);
   Serial.println("------------");
-  
-
-  angle += y;
-  if (angle > 180) angle = 180;
-  if (angle < 0) angle = 0;
-  s1.write(angle);
-  s2.write(angle);
-  s3.write(angle);
-
-  int prevMotorAngle = motorAngle;
-  motorAngle += x;
-  m.step(STEPS_PER_ROTATION * (motorAngle - prevMotorAngle) / 360.0);
 }

@@ -33,18 +33,6 @@ struct Vector2 {
   static Vector2 fromPolar(double angle, double radius = 1);
 };
 
-Vector2 operator*(double left, Vector2 const& right) {
-  return right * left;
-}
-Vector2 operator*(float left, Vector2 const& right) {
-  return right * left;
-}
-Vector2 operator*(int left, Vector2 const& right) {
-  return right * left;
-}
-
-
-
 class IK {
 public:
   IK(std::vector<Limb> limbs, int bias = 3, int iterations = 32);
@@ -52,8 +40,9 @@ public:
   std::vector<double> solve(Vector2 target);
   void resetPositions();
   void resetPositions(std::vector<Vector2> joints);
-  static double rad_to_deg(double deg);
-  static double deg_to_rad(double rad);
+  Vector2 getEndEffectorPos();
+  static double rad_to_deg(double rad);
+  static double deg_to_rad(double deg);
 
 private:
   const int bias;
