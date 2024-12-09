@@ -18,7 +18,7 @@ double Base::getAngle(bool radians) {
 
 void Base::resetAngle(double angle, bool radians) {
   if (radians)
-    currentAngle = IK::rad_to_deg(angle)
+    currentAngle = IK::rad_to_deg(angle);
   else
     currentAngle = angle;
 }
