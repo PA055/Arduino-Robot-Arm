@@ -16,6 +16,7 @@ double goalX;
 double goalY;
 double goalTheta;
 
+// set up Inverse Kinematics with arm lengths and 
 IK ik({
 //  limb len (in)   min angle constraint    max angle constraint
   { 7,              IK::deg_to_rad(-90),    IK::deg_to_rad(90)},
@@ -24,18 +25,25 @@ IK ik({
 });
 
 void setup() {
-  // put your setup code here, to run once:
+  // setup servos and buttons
   s1.attach(3);
   s2.attach(5);
   s3.attach(6);
   pinMode(joyP, INPUT);
   pinMode(openButton, INPUT);
   pinMode(closeButton, INPUT);
+
+  // setup initial goal position
+  Vector2 pos = ik.getEndEffectorPos();
+  goalX = pos.x;
+  goalY = pos.y;
+
+  // setup serial for debugging
   Serial.begin(9600);
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
+  // get joystick and button values
   double x = (2.0 * analogRead(joyX) / 1023.0 - 1) * -5;
   double y = (2.0 * analogRead(joyY) / 1023.0 - 1) * -5;
   if ((x < 0.2 && x > 0) || (x > -0.2 && x < 0)) x = 0;
@@ -44,6 +52,7 @@ void loop() {
   Serial.println(y);
   Serial.println("------------");
 
+  // rotate base using buttons
   if (digitalRead(openButton) == HIGH) {
     m.rotateBy(5);
   }
@@ -53,6 +62,8 @@ void loop() {
 
   goalX += x;
   goalY += y;
+
+  // Use inverse kinematics to get angle position 
   std::vector<double> angles = ik.solve({goalX, goalY});
   s1.write(IK::rad_to_deg(angles[0]) - 90);
   s2.write(IK::rad_to_deg(angles[1]) - 90);
